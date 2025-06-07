@@ -9,9 +9,15 @@
   "scripts": {
     "prebuild": "del-cli dist/**/*.*",
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "yarn run build && cd dist && node cli.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@inquirer/prompts": "^7.5.3",
+    "boxen": "^8.0.1",
+    "chalk": "^5.4.1",
+    "ora": "^8.2.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.30",
