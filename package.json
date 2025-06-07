@@ -8,13 +8,17 @@
   },
   "scripts": {
     "prebuild": "del-cli dist/**/*.*",
+    "test": "jest",
     "build": "tsc"
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.15.30",
     "del-cli": "^6.0.0",
+    "jest": "^29.7.0",
     "prettier": "3.5.3",
+    "ts-jest": "^29.3.4",
     "typescript": "^5.8.3"
   }
 }
