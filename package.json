@@ -7,11 +7,13 @@
     "node": ">14"
   },
   "scripts": {
+    "prebuild": "del-cli dist/**/*.*",
     "build": "tsc"
   },
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^22.15.30",
+    "del-cli": "^6.0.0",
     "prettier": "3.5.3",
     "typescript": "^5.8.3"
   }
