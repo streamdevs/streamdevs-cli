@@ -1,7 +1,4 @@
-import {
-  listenForAuthorizationCode,
-  successResponse,
-} from "./authorization-code";
+import { listenForAuthorizationCode } from "./authorization-code";
 import http from "node:http";
 import request from "supertest";
 
