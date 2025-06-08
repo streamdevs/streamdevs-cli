@@ -9,7 +9,6 @@ export function startHttpServer(port: number): Promise<http.Server | null> {
 
   return new Promise((resolve, reject) => {
     server.on("error", (e: NodeJS.ErrnoException) => {
-      debugger;
 
       if (e.code == <NetErrorCode>"EADDRINUSE") {
         return reject(

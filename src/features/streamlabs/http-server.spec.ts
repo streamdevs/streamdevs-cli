@@ -32,11 +32,11 @@ describe("http-server", () => {
   // Ports below 1024 require elevated permissions on some Operating Systems
   test("detects when we lack permissions to open a port", async () => {
     const serverMock = {
-      on: jest.fn(),
-      listen: jest.fn(),
+      on: vi.fn(),
+      listen: vi.fn(),
     };
 
-    const createServerSpy = jest.spyOn(http, "createServer");
+    const createServerSpy = vi.spyOn(http, "createServer");
     createServerSpy.mockReturnValue(serverMock as unknown as http.Server);
 
     serverMock.on.mockImplementation((event, callback) => {

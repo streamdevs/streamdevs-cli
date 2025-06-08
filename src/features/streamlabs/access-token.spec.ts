@@ -1,9 +1,10 @@
+import { MockAgent, setGlobalDispatcher } from "undici";
 import {
   AccessTokenResponse,
   getAccessToken,
   getAuthenticationPayload,
 } from "./access-token";
-import { ENDPOINTS, GRANT_TYPES } from "./config";
+import { API_HOST, API_PATH, ENDPOINTS, GRANT_TYPES, PATHS } from "./config";
 import {
   HttpStatusError,
   InvalidResponseError,
@@ -11,34 +12,35 @@ import {
 } from "./errors/streamlabs";
 
 describe("access-token", () => {
-  type OriginalFetch = typeof global.fetch;
-  const fetchMock = fetch as jest.Mock<
-    ReturnType<OriginalFetch>,
-    Parameters<OriginalFetch>
-  >;
+  let mockAgent: MockAgent | undefined;
+
+  beforeAll(() => {
+    mockAgent = new MockAgent();
+    mockAgent.enableCallHistory();
+    mockAgent.disableNetConnect();
+
+    // this setting will enable interception on all native `fetch` calls
+    setGlobalDispatcher(mockAgent);
+  });
 
   test("correctly calls the /token endpoint", async () => {
-    fetchMock.mockImplementation(() => {
-      return Promise.resolve(
-        new Response(
-          JSON.stringify({ access_token: "deadbeef" } as AccessTokenResponse),
-          {},
-        ),
-      );
-    });
+    mockAgent!
+      .get(API_HOST)
+      .intercept({
+        method: "POST",
+        path: `${API_PATH}${PATHS.token}`,
+      })
+      .reply(200, {
+        access_token: "deadbeef",
+      } as AccessTokenResponse);
 
     await getAccessToken("a", "b", "c", "d");
 
-    expect(fetchMock).toHaveBeenCalledWith(ENDPOINTS.token, {
-      body: JSON.stringify({
-        code: "c",
-        grant_type: GRANT_TYPES.authorization_code,
-        client_id: "a",
-        client_secret: "b",
-        redirect_uri: "d",
-      }),
+    const expectedPayload = getAuthenticationPayload("a", "b", "c", "d");
+    expect(mockAgent!.getCallHistory()?.firstCall()).toMatchObject({
+      fullUrl: ENDPOINTS.token,
+      body: JSON.stringify(expectedPayload),
       headers: {
-        "Content-Type": "application/json",
         Accept: "application/json",
       },
       method: "POST",
@@ -46,69 +48,65 @@ describe("access-token", () => {
   });
 
   test("correctly parses the response", async () => {
-    fetchMock.mockImplementation(() => {
-      return Promise.resolve(
-        new Response(
-          JSON.stringify({ access_token: "beef" } as AccessTokenResponse),
-          {
-            status: 200,
-          },
-        ),
-      );
-    });
+    mockAgent!
+      .get(API_HOST)
+      .intercept({
+        method: "POST",
+        path: `${API_PATH}${PATHS.token}`,
+      })
+      .reply(200, {
+        access_token: "deadbeef",
+      } as AccessTokenResponse);
 
     const token = await getAccessToken("", "", "", "");
 
-    expect(token).toBe("beef");
+    expect(token).toBe("deadbeef");
   });
 
   describe("handles Streamlabs errors", () => {
     test("HTTP errors", async () => {
-      fetchMock.mockImplementation(() => {
-        return Promise.resolve(
-          new Response("", {
-            status: 500,
-          }),
-        );
-      });
+      mockAgent!
+        .get(API_HOST)
+        .intercept({
+          method: "POST",
+          path: `${API_PATH}${PATHS.token}`,
+        })
+        .reply(500, {
+          error: "Something went wrong on Streamlabs' side",
+        });
 
       await expect(getAccessToken("", "", "", "")).rejects.toThrow(
         HttpStatusError,
       );
     });
 
-    test("Invalid JSON", () => {
-      fetchMock.mockImplementation(() => {
-        return Promise.resolve(
-          new Response("{", {
-            headers: {
-              "Content-Type": "application/json; charset=UTF-8",
-            },
-            status: 200,
-          }),
-        );
-      });
+    test("Invalid JSON", async () => {
+      mockAgent!
+        .get(API_HOST)
+        .intercept({
+          method: "POST",
+          path: `${API_PATH}${PATHS.token}`,
+        })
+        .reply(200, "{this is invalid json");
 
-      expect(getAccessToken("", "", "", "")).rejects.toThrow(
+      await expect(getAccessToken("", "", "", "")).rejects.toThrow(
         InvalidResponseError,
       );
     });
-    test("Missing token", () => {
-      fetchMock.mockImplementation(() => {
-        return Promise.resolve(
-          new Response(
-            `{"message": "These are not the tokens you are looking for"}`,
-            {
-              headers: {
-                "Content-Type": "application/json; charset=UTF-8",
-              },
-              status: 200,
-            },
-          ),
-        );
-      });
+    test("Missing token", async () => {
+      mockAgent!
+        .get(API_HOST)
+        .intercept({
+          method: "POST",
+          path: `${API_PATH}${PATHS.token}`,
+        })
+        .reply(200, {
+          message: "These are not the tokens you are looking for",
+        });
 
-      expect(getAccessToken("", "", "", "")).rejects.toThrow(MissingTokenError);
+      await expect(getAccessToken("", "", "", "")).rejects.toThrow(
+        MissingTokenError,
+      );
     });
   });
 });

@@ -7,11 +7,11 @@ import request from "supertest";
 
 describe("listenForAuthorizationCode", () => {
   let serverMock: http.Server;
-  let serverClose: jest.SpyInstance;
+  let serverClose: vi.SpyInstance;
 
   beforeEach(() => {
     serverMock = http.createServer();
-    serverClose = jest.spyOn(serverMock, "close");
+    serverClose = vi.spyOn(serverMock, "close");
   });
   afterEach(() => {
     if (serverMock.listening) {
@@ -40,6 +40,6 @@ describe("listenForAuthorizationCode", () => {
 
     // we MUST have stopped the HTTP server since we don't need it anymore
     expect(serverMock.listening).toBe(false);
-    expect(serverClose).toHaveBeenCalledTimes(1);
+    expect(serverClose).toBeCalledTimes(1);
   });
 });
