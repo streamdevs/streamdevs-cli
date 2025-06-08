@@ -13,7 +13,7 @@ const header = `
 
 const welcome = [
   `Welcome to the ${chalk.bold("StreamDevs")} CLI!`,
-  `Please report any issues on ${chalk.blue("https://github.com/streamdevs/streamdevs-cli/issues")}`,
+  `Please report any issues on ${chalk.blue("https://github.com/streamdevs/cli/issues")}`,
 ].join("\n");
 
 export async function run() {
