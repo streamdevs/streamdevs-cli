@@ -1,0 +1,31 @@
+{
+  "name": "@streamdevs/cli",
+  "version": "0.0.1-alpha.1",
+  "bin": "dist/cli.js",
+  "license": "GPL-3.0",
+  "engines": {
+    "node": ">14"
+  },
+  "scripts": {
+    "prebuild": "del-cli dist/**/*.*",
+    "build": "tsc",
+    "dev": "yarn run build && cd dist && node cli.js",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.5.3",
+    "boxen": "^8.0.1",
+    "chalk": "^5.4.1",
+    "ora": "^8.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/supertest": "^6.0.3",
+    "del-cli": "^6.0.0",
+    "prettier": "3.5.3",
+    "supertest": "^7.1.1",
+    "typescript": "^5.8.3",
+    "undici": "^7.10.0",
+    "vitest": "^3.2.2"
+  }
+}
