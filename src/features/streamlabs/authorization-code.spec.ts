@@ -37,6 +37,6 @@ describe("listenForAuthorizationCode", () => {
 
     // we MUST have stopped the HTTP server since we don't need it anymore
     expect(serverMock.listening).toBe(false);
-    expect(serverClose).toBeCalledTimes(1);
+    expect(serverClose).toHaveBeenCalledTimes(1);
   });
 });
