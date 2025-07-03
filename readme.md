@@ -12,7 +12,7 @@ npx @streamdevs/cli
 
 ### Authenticate with Streamlabs API
 
-Will help you get an authentication token to interact with the Streamlabs API via other **streamdevs** apps, like [`streamdevs/webhook`](https://github.com/streamdevs/streamdevs-webhook)
+Will help you get an authentication token to interact with the Streamlabs API via other **streamdevs** apps, like [`streamdevs/webhook`](https://github.com/streamdevs/webhook)
 
 ## Development
 
